@@ -1,0 +1,46 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-ship-lv7"
+spec:
+  description: "L7 policy for the shipping service"
+  endpointSelector:
+    matchLabels:
+      app: shippingservcie
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: frontend
+    toPorts:
+    - ports:
+      - port: "50051"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.ShippingService/GetQuote"
+  - fromEndpoints:
+    - matchLabels:
+        app: checkoutservice
+    toPorts:
+    - ports:
+      - port: "50051"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.ShippingService/GetQuote"    
+        - method: "POST"
+          path: "/hipstershop.ShippingService/ShipOrder"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: "*.default.svc.cluster.local"

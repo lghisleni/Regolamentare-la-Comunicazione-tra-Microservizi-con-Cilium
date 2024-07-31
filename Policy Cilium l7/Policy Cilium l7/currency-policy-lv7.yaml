@@ -1,0 +1,50 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-cur-lv7"
+spec:
+  description: "L7 policy for the currencyservice"
+  endpointSelector:
+    matchLabels:
+      app: currencyservice
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: frontend
+    toPorts:
+    - ports:
+      - port: "7000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/grpc.health.v1.Health/Check"
+        - method: "POST"
+          path: "/hipstershop.CurrencyService/GetSupportedCurrencies"
+        - method: "POST"
+          path: "/hipstershop.CurrencyService/Convert"
+  - fromEndpoints:
+    - matchLabels:
+        app: checkoutservice
+    toPorts:
+    - ports:
+      - port: "7000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/grpc.health.v1.Health/Check"
+        - method: "POST"
+          path: "/hipstershop.CurrencyService/Convert"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: "*.default.svc.cluster.local"

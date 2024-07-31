@@ -1,0 +1,160 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-frontend-lv7"
+spec:
+  description: "L7 policy for the frontend service"
+  endpointSelector:
+    matchLabels:
+      app: frontend
+  ingress:
+  - fromEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+  - fromEndpoints:
+    - matchLabels:
+        app: loadgenerator
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/"
+        - method: "POST"
+          path: "/setCurrency"
+        - method: "GET"
+          path: "/product/0PUK6V6EV0"
+        - method: "GET"
+          path: "/product/1YMWWN1N4O"
+        - method: "GET"
+          path: "/product/2ZYFJ3GM2N"
+        - method: "GET"
+          path: "/product/66VCHSJNUP"
+        - method: "GET"
+          path: "/product/6E92ZMYYFZ"
+        - method: "GET"
+          path: "/product/9SIQT8TOJO"
+        - method: "GET"
+          path: "/product/L9ECAV7KIM"
+        - method: "GET"
+          path: "/product/LS4PSXUNUM"
+        - method: "GET"
+          path: "/product/OLJCESPC7Z"
+        - method: "GET"
+          path: "/cart"
+        - method: "POST"
+          path: "/cart"
+        - method: "POST"
+          path: "/cart/empty"
+        - method: "POST"
+          path: "/cart/checkout"
+        - method: "GET"
+          path: "/logout"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: checkoutservice
+    toPorts:
+    - ports:
+      - port: "5050"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.CheckoutService/PlaceOrder"
+  - toEndpoints:
+    - matchLabels:
+        app: adservice
+    toPorts:
+    - ports:
+      - port: "9555"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.AdService/GetAds"
+  - toEndpoints:
+    - matchLabels:
+        app: productcatalogservice
+    toPorts:
+    - ports:
+      - port: "3550"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/grpc.health.v1.Health/Check"
+        - method: "POST"
+          path: "/hipstershop.ProductCatalogService/GetProduct"
+        - method: "POST"
+          path: "/hipstershop.ProductCatalogService/ListProducts"
+  - toEndpoints:
+    - matchLabels:
+        app: cartservice
+    toPorts:
+    - ports:
+      - port: "7070"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/grpc.health.v1.Health/Check"
+        - method: "POST"
+          path: "/hipstershop.CartService/AddItem"
+        - method: "POST"
+          path: "/hipstershop.CartService/EmptyCart"
+        - method: "POST"
+          path: "/hipstershop.CartService/GetCart"
+  - toEndpoints:
+    - matchLabels:
+        app: shippingservice
+    toPorts:
+    - ports:
+      - port: "50051"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.ShippingService/GetQuote"
+  - toEndpoints:
+    - matchLabels:
+        app: recommendationservice
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/hipstershop.RecommendationService/ListRecommendations"
+  - toEndpoints:
+    - matchLabels:
+        app: currencyservice
+    toPorts:
+    - ports:
+      - port: "7000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "POST"
+          path: "/grpc.health.v1.Health/Check"
+        - method: "POST"
+          path: "/hipstershop.CurrencyService/Convert"
+        - method: "POST"
+          path: "/hipstershop.CurrencyService/GetSupportedCurrencies"
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: "*.default.svc.cluster.local"

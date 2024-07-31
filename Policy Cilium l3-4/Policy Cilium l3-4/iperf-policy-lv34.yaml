@@ -1,0 +1,34 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: rule-iperf
+spec:
+  description: L3-L4 policy for iperf service
+  endpointSelector:
+    matchLabels:
+      app: iperf3
+  ingress:
+    - fromEndpoints:
+      - matchLabels:
+          app: iperf3
+      toPorts:
+      - ports:
+        - port: "12345"
+          protocol: ANY
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app: iperf3
+      toPorts:
+      - ports:
+        - port: "12345"
+          protocol: ANY
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": kube-system
+            "k8s:k8s-app": kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+        # altre regole egresso se necessario

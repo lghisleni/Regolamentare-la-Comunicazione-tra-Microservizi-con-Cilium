@@ -1,0 +1,26 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-redis-lv34"
+spec:
+  description: "L3-L4 policy for the redis-cart service"
+  endpointSelector:
+    matchLabels:
+      app: redis-cart
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: cartservice
+    toPorts:
+    - ports:
+      - port: "6379"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY

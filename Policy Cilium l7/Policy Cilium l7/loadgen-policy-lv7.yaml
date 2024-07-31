@@ -1,0 +1,64 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-loadgen-lv7"
+spec:
+  description: "L7 policy for the loadgenerator service"
+  endpointSelector:
+    matchLabels:
+      app: loadgenerator
+  ingress:
+  - {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: frontend
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/"
+        - method: "POST"
+          path: "/setCurrency"
+        - method: "GET"
+          path: "/product/0PUK6V6EV0"
+        - method: "GET"
+          path: "/product/1YMWWN1N4O"
+        - method: "GET"
+          path: "/product/2ZYFJ3GM2N"
+        - method: "GET"
+          path: "/product/66VCHSJNUP"
+        - method: "GET"
+          path: "/product/6E92ZMYYFZ"
+        - method: "GET"
+          path: "/product/9SIQT8TOJO"
+        - method: "GET"
+          path: "/product/L9ECAV7KIM"
+        - method: "GET"
+          path: "/product/LS4PSXUNUM"
+        - method: "GET"
+          path: "/product/OLJCESPC7Z"
+        - method: "GET"
+          path: "/cart"
+        - method: "POST"
+          path: "/cart"
+        - method: "POST"
+          path: "/cart/empty"
+        - method: "POST"
+          path: "/cart/checkout"
+        - method: "GET"
+          path: "/logout"
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: "*.default.svc.cluster.local"

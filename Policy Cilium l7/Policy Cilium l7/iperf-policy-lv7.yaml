@@ -1,0 +1,40 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "rule-email-lv7"
+spec:
+  description: "L7 policy for the iperf service"
+  endpointSelector:
+    matchLabels:
+      app: iperf3
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: iperf3
+    toPorts:
+    - ports:
+      - port: "12345"
+        protocol: ANY
+      rules:
+        http: [{}]
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: iperf3
+    toPorts:
+    - ports:
+      - port: "12345"
+        protocol: ANY
+      rules:
+        http: [{}]
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        "k8s:k8s-app": kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: "*.default.svc.cluster.local"
