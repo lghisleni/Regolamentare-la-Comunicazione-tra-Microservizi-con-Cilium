@@ -31,4 +31,3 @@ spec:
         - ports:
             - port: "53"
               protocol: ANY
-        # altre regole egresso se necessario
